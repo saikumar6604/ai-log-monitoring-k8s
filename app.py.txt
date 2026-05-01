@@ -1,0 +1,39 @@
+from flask import Flask
+import logging
+import random
+import time
+
+app = Flask(__name__)
+
+logging.basicConfig(
+    filename='/logs/app.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+@app.route('/')
+def home():
+    logging.info("Normal request received")
+    return "App Running Successfully"
+
+@app.route('/error')
+def error():
+    if random.random() > 0.6:
+        logging.error("Critical error occurred!")
+        return "Error occurred", 500
+    logging.info("Handled request without error")
+    return "No error"
+
+@app.route('/load')
+def load():
+    for i in range(10000):
+        pass
+    logging.warning("High CPU load simulated")
+    return "Load simulated"
+
+if __name__ == "__main__":
+    while True:
+        logging.info("Background log entry")
+        time.sleep(5)
+        break
+    app.run(host="0.0.0.0", port=5000)

@@ -1,0 +1,31 @@
+import time
+import numpy as np
+from sklearn.ensemble import IsolationForest
+
+LOG_FILE = "../logs/app.log"
+
+def read_logs():
+    try:
+        with open(LOG_FILE, "r") as f:
+            lines = f.readlines()
+            return lines[-20:]
+    except:
+        return []
+
+def extract_features(logs):
+    return np.array([len(log) for log in logs]).reshape(-1, 1)
+
+model = IsolationForest(contamination=0.2)
+
+while True:
+    logs = read_logs()
+    
+    if len(logs) > 10:
+        data = extract_features(logs)
+        model.fit(data)
+        predictions = model.predict(data)
+
+        if -1 in predictions:
+            print("🚨 Anomaly Detected in Logs!")
+
+    time.sleep(10)
